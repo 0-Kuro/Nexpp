@@ -1,4 +1,4 @@
-name: C++ Tests CI
+name: C++ with Qt and Tests CI
 
 on:
   push:
@@ -7,9 +7,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
-    name: Build & Run Unit Tests
+  build-and-test:
     runs-on: ubuntu-latest
+
+    env:
+      QT_EMAIL: ${{ secrets.QT_ACCOUNT_EMAIL }}
+      QT_PASSWORD: ${{ secrets.QT_ACCOUNT_PASSWORD }}
 
     steps:
       - name: Checkout repository
@@ -18,15 +21,28 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build
+          sudo apt-get install -y ninja-build cmake
 
-      - name: Configure (tests only)
+      - name: Install Qt 6.9.0
+        uses: jurplel/install-qt-action@v4.2.1
+        with:
+          version: '6.9.0'
+          host: 'linux'
+          target: 'desktop'
+          use-official: true
+          email: ${{ env.QT_EMAIL }}
+          pw: ${{ env.QT_PASSWORD }}
+          modules: 'qtbase qttools qtsvg'
+          install-deps: true
+          cache: true
+
+      - name: Configure (build with Qt)
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS_ONLY=ON
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build tests
+      - name: Build
         run: |
           cd build
           cmake --build .
@@ -35,4 +51,3 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
-

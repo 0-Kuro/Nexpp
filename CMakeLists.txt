@@ -22,6 +22,24 @@ if(NOT BUILD_TESTS_ONLY)
   find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
   qt_add_resources(APP_RESOURCES resources.qrc)
 
+  target_compile_options(Nexpp PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Werror
+    -Wshadow
+    -Wnon-virtual-dtor
+    -Wold-style-cast
+    -Wcast-align
+    -Wunused
+    -Wconversion
+    -Wsign-conversion
+    -Wnull-dereference
+    -Wdouble-promotion
+    -Wimplicit-fallthrough
+  )
+
+
   add_executable(
     Nexpp 
     src/main.cpp

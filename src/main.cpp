@@ -1,7 +1,10 @@
-#include "ProjectName/main.h"
+#include "Nexpp/main.h"
 
-int main(void) {
-  std::cout << "Hello, World !" << std::endl;
+#include <QApplication>
 
-  return 0;
+int main(int argc, char **argv)
+{
+  QApplication app(argc, argv);
+
+  return app.exec();
 }

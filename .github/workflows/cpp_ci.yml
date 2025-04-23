@@ -1,0 +1,38 @@
+name: C++ Tests CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Build & Run Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+
+      - name: Configure (tests only)
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS_ONLY=ON
+
+      - name: Build tests
+        run: |
+          cd build
+          cmake --build .
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
+

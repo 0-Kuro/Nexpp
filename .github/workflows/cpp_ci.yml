@@ -1,4 +1,4 @@
-name: C++ with Qt and Tests CI
+name: C++ Build and Test
 
 on:
   push:
@@ -18,12 +18,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ninja-build cmake
 
-      - name: Install Qt 6.9.0
+      - name: Install Qt 6.9.0 via official installer
         uses: jurplel/install-qt-action@v4.2.1
         with:
           version: '6.9.0'
@@ -36,20 +36,20 @@ jobs:
           modules: 'qtbase qttools qtsvg'
           install-deps: true
           cache: true
-          outputdir: '${{ github.workspace }}/Qt'
+          set-env: true  # Ensures CMAKE_PREFIX_PATH is set properly
 
-      - name: Configure (build with Qt)
+      - name: Configure project with CMake (Release + Ninja)
         run: |
           mkdir build
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build
+      - name: Build project
         run: |
           cd build
           cmake --build .
 
-      - name: Run tests
+      - name: Run unit tests
         run: |
           cd build
           ctest --output-on-failure

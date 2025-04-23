@@ -29,12 +29,14 @@ jobs:
           version: '6.9.0'
           host: 'linux'
           target: 'desktop'
+          arch: 'gcc_64'
           use-official: true
           email: ${{ env.QT_EMAIL }}
           pw: ${{ env.QT_PASSWORD }}
           modules: 'qtbase qttools qtsvg'
           install-deps: true
           cache: true
+          outputdir: '${{ github.workspace }}/Qt'
 
       - name: Configure (build with Qt)
         run: |

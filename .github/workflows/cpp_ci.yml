@@ -23,22 +23,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ninja-build cmake
 
-      - name: Install Qt 6.9.0 via official installer
-        uses: jurplel/install-qt-action@v4.2.1
+      - name: Install Qt 6.9.0 (with qtimageformats) via aqt
+        uses: jurplel/install-qt-action@v3
         with:
+          aqtversion: '==3.1.*'
           version: '6.9.0'
           host: 'linux'
           target: 'desktop'
-          arch: 'gcc_64'
-          use-official: true
-          email: ${{ env.QT_EMAIL }}
-          pw: ${{ env.QT_PASSWORD }}
-          modules: 'qtbase qttools qtsvg'
+          arch: 'linux_gcc_64'
+          modules: 'qtimageformats'
           install-deps: true
           cache: true
-          set-env: true  # Ensures CMAKE_PREFIX_PATH is set properly
+          set-env: true
 
-      - name: Configure project with CMake (Release + Ninja)
+      - name: Configure project (Release + Ninja)
         run: |
           mkdir build
           cd build

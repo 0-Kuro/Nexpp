@@ -8,8 +8,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
-qt_add_resources(APP_RESOURCES resources.qrc)
+option(BUILD_TESTS_ONLY "Build only unit tests (no main application)" OFF)
 
 include(FetchContent)
 
@@ -19,20 +18,24 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(
-  Nexpp 
-  src/main.cpp
-)
+if(NOT BUILD_TESTS_ONLY)
+  find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
+  qt_add_resources(APP_RESOURCES resources.qrc)
 
-target_sources(
-  Nexpp
-  PRIVATE
-  ${APP_RESOURCES}
-)
+  add_executable(
+    Nexpp 
+    src/main.cpp
+  )
 
-target_include_directories(Nexpp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  target_sources(
+    Nexpp
+    PRIVATE
+    ${APP_RESOURCES}
+  )
 
-target_link_libraries(Nexpp Qt6::Widgets Qt6::Svg)
+  target_include_directories(Nexpp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  target_link_libraries(Nexpp Qt6::Widgets Qt6::Svg)
+endif()
 
 enable_testing()
 

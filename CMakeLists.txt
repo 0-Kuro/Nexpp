@@ -65,6 +65,4 @@ target_link_libraries(
 )
 
 include(GoogleTest)
-
 gtest_discover_tests(nexpp_tests)
-test_discover_tests(nexpp_tests)

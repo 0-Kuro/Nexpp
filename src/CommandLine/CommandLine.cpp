@@ -11,11 +11,14 @@ CommandLine::CommandLine(const QApplication &application)
 
   setup_options();
   m_parser.process(application);
+
+  consume_options();
 }
 
 void CommandLine::setup_options()
 {
   add_mode_option();
+  add_project_name_option();
   add_destination_option();
   add_libraries_option();
   add_standards_option();
@@ -33,6 +36,16 @@ void CommandLine::add_mode_option()
       QApplication::translate("main", "cli/gui")
   );
   m_parser.addOption(mode_option);
+}
+
+void CommandLine::add_project_name_option()
+{
+  QCommandLineOption project_name_option(
+      QStringList() << "n" << "name",
+      QApplication::translate("main", "The name of your project"),
+      QApplication::translate("main", "Project name")
+  );
+  m_parser.addOption(project_name_option);
 }
 
 void CommandLine::add_destination_option()
@@ -92,4 +105,59 @@ QCommandLineOption CommandLine::create_option_with_allowed_values(
                                        .arg(allowed_values.join(", "));
 
   return QCommandLineOption(names, full_description, value_name);
+}
+
+AppMode CommandLine::get_mode() const
+{
+  return m_mode;
+}
+
+QString CommandLine::get_project_name() const
+{
+  return m_project_name;
+}
+
+QString CommandLine::get_destination() const
+{
+  return m_destination;
+}
+
+QStringList CommandLine::get_libraries() const
+{
+  return m_libraries;
+}
+
+Standard CommandLine::get_standard() const
+{
+  return m_standard;
+}
+
+bool CommandLine::has_flags() const
+{
+  return m_has_flags;
+}
+
+// todo(Darleanow): New MR for arg checks
+void CommandLine::consume_options()
+{
+  QString mode_value = m_parser.value("m");
+  if(mode_value.isEmpty()) {
+    m_mode = AppMode::CLI;
+  } else {
+    m_mode = (mode_value.toLower() == "gui") ? AppMode::GUI : AppMode::CLI;
+  }
+
+  m_project_name =
+      m_parser.value("n").isEmpty() ? "NexppProject" : m_parser.value("n");
+
+  m_destination = m_parser.value("d").isEmpty() ? "./" : m_parser.value("d");
+
+  QString libraries = m_parser.value("l");
+  m_libraries = libraries.isEmpty() ? QStringList() : libraries.split(",");
+
+  QString standard = m_parser.value("s");
+  m_standard =
+      standard.isEmpty() ? Standard::CPP23 : from_int(standard.toInt());
+
+  m_has_flags = m_parser.isSet("f");
 }

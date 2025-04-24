@@ -22,6 +22,18 @@ if(NOT BUILD_TESTS_ONLY)
   find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
   qt_add_resources(APP_RESOURCES resources.qrc)
 
+  add_executable(Nexpp 
+    src/main.cpp
+    ${APP_RESOURCES}
+  )
+
+  target_include_directories(Nexpp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+  target_link_libraries(Nexpp 
+    Qt6::Widgets 
+    Qt6::Svg
+  )
+
   target_compile_options(Nexpp PRIVATE
     -Wall
     -Wextra
@@ -38,21 +50,6 @@ if(NOT BUILD_TESTS_ONLY)
     -Wdouble-promotion
     -Wimplicit-fallthrough
   )
-
-
-  add_executable(
-    Nexpp 
-    src/main.cpp
-  )
-
-  target_sources(
-    Nexpp
-    PRIVATE
-    ${APP_RESOURCES}
-  )
-
-  target_include_directories(Nexpp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-  target_link_libraries(Nexpp Qt6::Widgets Qt6::Svg)
 endif()
 
 enable_testing()
@@ -68,4 +65,6 @@ target_link_libraries(
 )
 
 include(GoogleTest)
+
 gtest_discover_tests(nexpp_tests)
+test_discover_tests(nexpp_tests)

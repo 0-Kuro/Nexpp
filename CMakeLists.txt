@@ -25,6 +25,7 @@ if(NOT BUILD_TESTS_ONLY)
   add_executable(Nexpp 
     src/main.cpp
     src/CommandLine/CommandLine.cpp
+    src/Data/CMakeBase.cpp
     ${APP_RESOURCES}
   )
 

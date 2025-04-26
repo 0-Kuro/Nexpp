@@ -1,4 +1,6 @@
 #include "Nexpp/CommandLine/CommandLine.h"
+#include <qlogging.h>
+#include <stdexcept>
 
 CommandLine::CommandLine(const QApplication &application)
 {
@@ -137,25 +139,68 @@ bool CommandLine::has_flags() const
   return m_has_flags;
 }
 
-// todo(Darleanow): New MR for arg checks
 void CommandLine::consume_options()
 {
   QString mode_value = m_parser.value("m");
   if(mode_value.isEmpty()) {
     m_mode = AppMode::CLI;
   } else {
+    if(mode_value.toLower() != "gui" && mode_value.toLower() != "cli") {
+      throw std::runtime_error("Mode argument is invalid");
+    }
+
     m_mode = (mode_value.toLower() == "gui") ? AppMode::GUI : AppMode::CLI;
   }
 
-  m_project_name =
-      m_parser.value("n").isEmpty() ? "NexppProject" : m_parser.value("n");
+  if(m_parser.value("n").isEmpty()) {
+    throw std::runtime_error("Project name is required (-n) !");
+  }
+
+  m_project_name = m_parser.value("n");
+
+  if(m_parser.value("d").isEmpty()) {
+    qWarning(
+    ) << "Destination value not provided, creating on current directory...";
+  }
 
   m_destination = m_parser.value("d").isEmpty() ? "./" : m_parser.value("d");
 
   QString libraries = m_parser.value("l");
-  m_libraries = libraries.isEmpty() ? QStringList() : libraries.split(",");
+
+  if(!libraries.isEmpty()) {
+    QStringList libs = libraries.split(",");
+    QStringList unique_libs;
+
+    for(const auto &lib : libs) {
+      QString lower_lib = lib.toLower();
+      if(lower_lib != "qt" && lower_lib != "gtest") {
+        throw std::runtime_error("Unrecognized library: " + lib.toStdString());
+      }
+      bool already_present = std::any_of(
+          unique_libs.begin(), unique_libs.end(),
+          [&](const QString &existing) {
+            return existing.compare(lower_lib, Qt::CaseInsensitive) == 0;
+          }
+      );
+      if(!already_present) {
+        unique_libs.append(lower_lib);
+      }
+    }
+
+    m_libraries = unique_libs;
+  } else {
+    m_libraries = QStringList();
+  }
 
   QString standard = m_parser.value("s");
+
+  int     standard_value = standard.toInt();
+
+  if(standard_value != 14 && standard_value != 17 && standard_value != 20 &&
+     standard_value != 23) {
+    qWarning() << "Unrecognized standard, defaulting to 23...";
+  }
+
   m_standard =
       standard.isEmpty() ? Standard::CPP23 : from_int(standard.toInt());
 

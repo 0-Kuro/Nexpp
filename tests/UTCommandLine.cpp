@@ -110,6 +110,21 @@ TEST_F(CommandLineTest, DedupLibraries)
   EXPECT_EQ(cmd.get_libraries().size(), 1);
 }
 
+TEST_F(CommandLineTest, DedupLibrariesCaseInsensitive)
+{
+  prepare_args({"nexpp", "-n", "TestProject", "-l", "qt,Qt"});
+  QApplication app(argc, get_argv());
+  CommandLine  cmd(app);
+  EXPECT_EQ(cmd.get_libraries().size(), 1);
+}
+
+TEST_F(CommandLineTest, CrashOnSpaceLibs)
+{
+  prepare_args({"nexpp", "-n", "TestProject", "-l", "qt, qt"});
+  QApplication app(argc, get_argv());
+  EXPECT_THROW(CommandLine cmd(app), std::runtime_error);
+}
+
 TEST_F(CommandLineTest, StandardDefaultsToCPP23)
 {
   prepare_args({"nexpp", "-n", "TestProject"});

@@ -13,6 +13,7 @@ jobs:
     env:
       QT_EMAIL: ${{ secrets.QT_ACCOUNT_EMAIL }}
       QT_PASSWORD: ${{ secrets.QT_ACCOUNT_PASSWORD }}
+      QT_QPA_PLATFORM: offscreen
 
     steps:
       - name: Checkout repository

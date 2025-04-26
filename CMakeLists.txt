@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(Nexpp)
+project(Nexpp LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -11,60 +11,56 @@ set(CMAKE_AUTORCC ON)
 option(BUILD_TESTS_ONLY "Build only unit tests (no main application)" OFF)
 
 include(FetchContent)
-
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
 FetchContent_MakeAvailable(googletest)
 
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Svg)
+
+add_library(nexpp_lib STATIC
+  src/CommandLine/CommandLine.cpp
+  src/Data/CMakeBase.cpp
+)
+
+target_include_directories(nexpp_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_link_libraries(nexpp_lib
+  Qt6::Core
+  Qt6::Widgets
+  Qt6::Svg
+)
+
+target_compile_options(nexpp_lib PRIVATE
+  -Wall -Wextra -Wpedantic -Werror
+  -Wshadow -Wnon-virtual-dtor -Wold-style-cast
+  -Wcast-align -Wunused -Wconversion -Wsign-conversion
+  -Wnull-dereference -Wdouble-promotion -Wimplicit-fallthrough
+)
+
 if(NOT BUILD_TESTS_ONLY)
-  find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
   qt_add_resources(APP_RESOURCES resources.qrc)
 
-  add_executable(Nexpp 
+  add_executable(Nexpp
     src/main.cpp
-    src/CommandLine/CommandLine.cpp
-    src/Data/CMakeBase.cpp
     ${APP_RESOURCES}
   )
 
-  target_include_directories(Nexpp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-  target_link_libraries(Nexpp 
-    Qt6::Widgets 
-    Qt6::Svg
-  )
-
-  target_compile_options(Nexpp PRIVATE
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Werror
-    -Wshadow
-    -Wnon-virtual-dtor
-    -Wold-style-cast
-    -Wcast-align
-    -Wunused
-    -Wconversion
-    -Wsign-conversion
-    -Wnull-dereference
-    -Wdouble-promotion
-    -Wimplicit-fallthrough
-  )
+  target_link_libraries(Nexpp PRIVATE nexpp_lib)
 endif()
 
 enable_testing()
 
-add_executable(
-  nexpp_tests
-  tests/hello_test.cpp 
+add_executable(nexpp_tests
+  tests/UTCommandLine.cpp
 )
 
-target_link_libraries(
-  nexpp_tests
+target_link_libraries(nexpp_tests
+  nexpp_lib                
   GTest::gtest_main
 )
 
 include(GoogleTest)
 gtest_discover_tests(nexpp_tests)
+

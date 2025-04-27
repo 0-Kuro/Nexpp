@@ -7,7 +7,7 @@ void FileSystem::create_folder(
     std::filesystem::path path, std::string folder_name
 )
 {
-  std::filesystem::create_directory(path.string() + folder_name);
+  std::filesystem::create_directory(path / folder_name);
 }
 
 void FileSystem::create_file(std::filesystem::path path, std::string filename)

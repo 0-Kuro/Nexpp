@@ -21,6 +21,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets Svg)
 
 add_library(nexpp_lib STATIC
   src/CommandLine/CommandLine.cpp
+  src/FileSystem/FileSystem.cpp
   src/Data/CMakeBase.cpp
 )
 
@@ -54,6 +55,7 @@ enable_testing()
 
 add_executable(nexpp_tests
   tests/UTCommandLine.cpp
+  tests/UTFileSystem.cpp
 )
 
 target_link_libraries(nexpp_tests
